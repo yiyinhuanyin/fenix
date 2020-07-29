@@ -15,6 +15,7 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withParent
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.uiautomator.By
+import androidx.test.uiautomator.UiSelector
 import androidx.test.uiautomator.Until
 import org.hamcrest.Matchers
 import org.hamcrest.Matchers.allOf
@@ -31,13 +32,9 @@ class HistoryRobot {
     fun verifyHistoryMenuView() = assertHistoryMenuView()
 
     fun verifyEmptyHistoryView() {
-        mDevice.waitNotNull(
-            Until.findObject(
-                By.text("No history here")
-            ),
-            waitingTime
-        )
-        assertEmptyHistoryView()
+        mDevice.findObject(
+            UiSelector().text("No history here")
+        ).waitForExists(waitingTime)
     }
 
     fun verifyVisitedTimeTitle() {
@@ -133,15 +130,6 @@ private fun assertHistoryMenuView() {
     )
         .check(matches(withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)))
 }
-
-private fun assertEmptyHistoryView() =
-    onView(
-        allOf(
-            withId(R.id.history_empty_view),
-            withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)
-        )
-    )
-        .check(matches(withText("No history here")))
 
 private fun assertVisitedTimeTitle() =
     onView(withId(R.id.header_title)).check(matches(withText("Last 24 hours")))

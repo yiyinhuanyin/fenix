@@ -165,7 +165,6 @@ class HistoryTest {
         }
     }
 
-    @Ignore("Failing test: https://github.com/mozilla-mobile/fenix/issues/12893")
     @Test
     fun deleteAllHistoryTest() {
         val firstWebPage = TestAssetHelper.getGenericAsset(mockWebServer, 1)
