@@ -5,7 +5,9 @@
 package org.mozilla.fenix.ui
 
 import android.content.Context
+import android.view.View
 import androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu
+import androidx.test.espresso.IdlingRegistry
 import kotlinx.coroutines.runBlocking
 import mozilla.components.browser.storage.sync.PlacesHistoryStorage
 import okhttp3.mockwebserver.MockWebServer
@@ -14,10 +16,12 @@ import org.junit.Before
 import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
+import org.mozilla.fenix.R
 import org.mozilla.fenix.helpers.AndroidAssetDispatcher
 import org.mozilla.fenix.helpers.HomeActivityTestRule
 import org.mozilla.fenix.helpers.TestAssetHelper
 import org.mozilla.fenix.helpers.TestHelper.longTapSelectItem
+import org.mozilla.fenix.helpers.ViewVisibilityIdlingResource
 import org.mozilla.fenix.ui.robots.historyMenu
 import org.mozilla.fenix.ui.robots.homeScreen
 import org.mozilla.fenix.ui.robots.mDevice
@@ -31,6 +35,7 @@ import org.mozilla.fenix.ui.robots.navigationToolbar
 class HistoryTest {
     /* ktlint-disable no-blank-line-before-rbrace */ // This imposes unreadable grouping.
     private lateinit var mockWebServer: MockWebServer
+    private var emptyHistoryView: ViewVisibilityIdlingResource? = null
 
     @get:Rule
     val activityTestRule = HomeActivityTestRule()
@@ -41,6 +46,11 @@ class HistoryTest {
             setDispatcher(AndroidAssetDispatcher())
             start()
         }
+
+        emptyHistoryView = ViewVisibilityIdlingResource(
+            activityTestRule.activity.findViewById(R.id.notification_dot),
+            View.VISIBLE
+        )
     }
 
     @After
@@ -53,6 +63,8 @@ class HistoryTest {
         runBlocking {
             historyStorage.deleteEverything()
         }
+
+        IdlingRegistry.getInstance().unregister(emptyHistoryView)
     }
 
     @Test
@@ -178,6 +190,11 @@ class HistoryTest {
             verifyDeleteConfirmationMessage()
             confirmDeleteAllHistory()
             verifyDeleteSnackbarText("Browsing data deleted")
+            emptyHistoryView = ViewVisibilityIdlingResource(
+                activityTestRule.activity.findViewById(R.id.history_empty_view),
+                View.VISIBLE
+            )
+            IdlingRegistry.getInstance().register(emptyHistoryView!!)
             verifyEmptyHistoryView()
         }
     }

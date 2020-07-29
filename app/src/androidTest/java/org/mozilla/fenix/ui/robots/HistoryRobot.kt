@@ -32,9 +32,10 @@ class HistoryRobot {
     fun verifyHistoryMenuView() = assertHistoryMenuView()
 
     fun verifyEmptyHistoryView() {
-        mDevice.findObject(
-            UiSelector().text("No history here")
-        ).waitForExists(waitingTime)
+//        mDevice.findObject(
+//            UiSelector().text("No history here")
+//        ).waitForExists(waitingTime)
+        onView(withId(R.id.history_empty_view)).check(matches(withText("No history here")))
     }
 
     fun verifyVisitedTimeTitle() {
